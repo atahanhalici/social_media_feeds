@@ -336,7 +336,7 @@ _pickImageFromGallery();
 
 void _processData(MainViewModel _mainModel, UserViewModel _userModel) async {
   if (_headerController.text.isEmpty || _bodyController.text.isEmpty) {
-    _showAlertDialog('Uyarı', 'Header ve Body boş olamaz!');
+    _showAlertDialog('Warning', 'Header and Body cannot be empty!');
   } else {
     List<String> imagePaths = [];
     for (var image in _images) {
@@ -371,7 +371,7 @@ void _showAlertDialog(String title, String message) {
         content: SingleChildScrollView(child: Text(message)),
         actions: <Widget>[
           TextButton(
-            child:const Text('Tamam'),
+            child:const Text('Okey'),
             onPressed: () {
               Navigator.of(context).pop();
             },

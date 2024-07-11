@@ -89,6 +89,16 @@ class MainViewModel with ChangeNotifier {
    await Future.delayed(const Duration(seconds: 1));
        state = ViewState.geldi;
   }
+
+  void removeLike(String id, String username) async{
+    await _repository.removeLike(id,username);
+    notifyListeners();
+  }
+
+  Future<void> deleteComment(String id, String username, String comment)async {
+     await _repository.deleteComment(id,username,comment);
+    notifyListeners();
+  }
   }
   
 

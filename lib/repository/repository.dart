@@ -32,4 +32,12 @@ getMorePosts(List posts)async{
   sendPost(String text, String text2, List<String> base64images,String username) async{
     return await _databaseService.sendPost(text,text2,base64images,username);
   }
+
+  removeLike(String id, String username)async {
+    return await _databaseService.removeLike(id,username);
+  }
+
+  deleteComment(String id, String username, String comment) async{
+ return await _databaseService.deleteComment(id,username,comment);
+  }
 }

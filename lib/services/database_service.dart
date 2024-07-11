@@ -110,6 +110,23 @@ Future<Map<String, dynamic>>  signUp(String email, String password, String usern
     Post post=Post(randomId, DateTime.now().toString(), text, text2, base64images, username, [], []);
     await box.add(post);
   }
+
+  removeLike(String id, String username) async{
+     var box = await Hive.openBox<Post>('posts');
+      final post = box.values.firstWhere((post) => post.id == id);
+      post.likes.remove(username);
+      await box.put(post.key,post);
+  }
+
+  deleteComment(String id, String username, String comment) async{
+ var box = await Hive.openBox<Post>('posts');
+      final post = box.values.firstWhere((post) => post.id == id);
+      post.comments.removeWhere((map) =>
+    map.keys.first == username &&
+    map.values.first == comment
+  );
+      await box.put(post.key,post);
+  }
 }
 
  

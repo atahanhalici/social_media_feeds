@@ -31,10 +31,10 @@ class _PostDetailPageState extends State<PostDetailPage> {
   }
   final CarouselController _carouselController = CarouselController();
    int _current = 0;
-    void _showBottomSheet(BuildContext context , List likes) {
+    void _showBottomSheet(BuildContext context , List likes,UserViewModel _userModel, MainViewModel _mainModel,String id) {
 
     showModalBottomSheet(
-      context: context,
+      context: context, 
       builder: (BuildContext context) {
        
         return StatefulBuilder(
@@ -55,26 +55,65 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                   physics:const NeverScrollableScrollPhysics(),
                                   itemCount: likes.length,
                                   itemBuilder: (context, idx) {
-                                    return Container(
-                                      margin:const EdgeInsets.symmetric(vertical: 10),
-                                      padding:const EdgeInsets.all(10),
-                                      
-                                      child:
-                                       
-                                        Row(
-                                          children: [
-                                         const   CircleAvatar(backgroundImage: AssetImage('assets/logoyazisiz.jpg'),),
-                                       const     SizedBox(width: 10,),
-                                            Text(
-                                              likes[idx].toString(),
-                                              style:const TextStyle(
-                                                fontSize: 18,
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                          ],
+                                    return GestureDetector(
+                                      onTap: (){
+                                        if(likes[idx]==_userModel.user.username){
+                                          _mainModel.removeLike(id,_userModel.user.username);
+                                          Navigator.of(context).pop();
+                                        }
+                                      },
+                                      child: Container(
+                                        margin:const EdgeInsets.symmetric(vertical: 10),
+                                        padding:const EdgeInsets.all(10),
+                                        color: Colors.transparent,
+                                        width: double.infinity,
+                                        child:
+                                         
+                                          Row(
+                                            children: [
+                                             Container(
+                                        width: 35.0, 
+                                        height: 35.0, 
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: Colors.black, // Kenarlık rengi
+                                            width: 1.5, // Kenarlık genişliği
+                                          ),
                                         ),
-                                     
+                                        child: CircleAvatar(
+                                          backgroundImage: AssetImage('assets/logoyazisiz.jpg'),
+                                        ),
+                                      ),
+                                         const     SizedBox(width: 10,),
+                                              Column(
+                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    likes[idx].toString(),
+                                                    style:const TextStyle(
+                                                      fontSize: 18,
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                             
+                                                   Visibility(
+                                                    visible: likes[idx]==_userModel.user.username,
+                                                     child: Text(
+                                                      "tap to withdraw like",
+                                                      style:const TextStyle(
+                                                        fontSize: 13,
+                                                        color: Colors.black54,
+                                                      ),
+                                                                                                     ),
+                                                   ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                       
+                                      ),
                                     );
                                   },separatorBuilder: (context, index) {
                                     return const Divider();
@@ -305,16 +344,16 @@ class _PostDetailPageState extends State<PostDetailPage> {
 ,
                                         
  if (argument.likes.length == 1) GestureDetector(
-  onTap: () => _showBottomSheet(context,argument.likes),
+  onTap: () => _showBottomSheet(context,argument.likes,_userModel,_mainModel,argument.id),
    child: Row(
         children: [
-          Text("${argument.likes.contains(_userModel.user.username)?"Siz":{argument.likes[0]}}",style:const TextStyle(fontWeight: FontWeight.w700),),
+          Text(argument.likes.contains(_userModel.user.username)?"Siz":argument.likes[0],style:const TextStyle(fontWeight: FontWeight.w700),),
           Text(argument.likes.contains(_userModel.user.username)?" beğendiniz":" beğendi"),
         ],
       ),
  ) else argument.likes.length > 1
         ? GestureDetector(
-           onTap: () => _showBottomSheet(context,argument.likes),
+           onTap: () => _showBottomSheet(context,argument.likes,_userModel,_mainModel,argument.id),
           child: Row(
             children: [
               Text(argument.likes.contains(_userModel.user.username)?"Siz":argument.likes[0],style:const TextStyle(fontWeight: FontWeight.w700),),
@@ -381,35 +420,67 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                   physics:const NeverScrollableScrollPhysics(),
                                   itemCount: argument.comments.length,
                                   itemBuilder: (context, idx) {
-                                    return Container(
-                                      margin:const EdgeInsets.symmetric(vertical: 4),
-                                      padding:const EdgeInsets.all(10),
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[200],
-                                        borderRadius: BorderRadius.circular(8),
+                                    return GestureDetector(
+                                      onLongPress: () {
+                                        if(argument.comments[idx].keys.first==_userModel.user.username){
+                                          showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text("Comment will be deleted"),
+        content: SingleChildScrollView(child: Text("Are you sure you want to delete your comment?")),
+        actions: <Widget>[
+          TextButton(
+            child:const Text('No'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            
+          ),
+          TextButton(
+            child:const Text('Yes'),
+            onPressed: () async{
+             await _mainModel.deleteComment(argument.id,_userModel.user.username,argument.comments[idx].values.first);
+              Navigator.of(context).pop();
+            },
+            
+          ),
+        ],
+      );
+    },
+  );
+                                        }
+                                      },
+                                      child: Container(
+                                        margin:const EdgeInsets.symmetric(vertical: 4),
+                                        padding:const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[200],
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child:RichText(
+                                          text: TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: "${argument.comments[idx].keys.first}: ",
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                              color: Color.fromARGB(255, 34, 126, 167), 
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: argument.comments[idx].values.first.toString(),
+                                            style:const TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.black54, 
+                                            ),
+                                          ),
+                                        ],
+                                          ),
+                                         
+                                        ), 
                                       ),
-                                      child:RichText(
-                                        text: TextSpan(
-                                      children: [
-                                        TextSpan(
-                                          text: "${argument.comments[idx].keys.first}: ",
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                            color: Color.fromARGB(255, 34, 126, 167), 
-                                          ),
-                                        ),
-                                        TextSpan(
-                                          text: argument.comments[idx].values.first.toString(),
-                                          style:const TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.black54, 
-                                          ),
-                                        ),
-                                      ],
-                                        ),
-                                       
-                                      ), 
                                     );
                                   },
                                 ),
