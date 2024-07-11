@@ -7,6 +7,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:social_media_feeds/viewmodels/main_viewmodel.dart';
 import 'package:social_media_feeds/viewmodels/user_viewmodel.dart';
@@ -313,7 +314,7 @@ _pickImageFromGallery();
     );
   }
 
- void _processData(MainViewModel _mainModel, UserViewModel _userModel) async {
+ /*void _processData(MainViewModel _mainModel, UserViewModel _userModel) async {
   if (_headerController.text.isEmpty || _bodyController.text.isEmpty) {
     _showAlertDialog('Uyarı', 'Header ve Body boş olamaz!');
   } else {
@@ -330,6 +331,34 @@ _pickImageFromGallery();
           '/homepage',
           (Route<dynamic> route) => false,
         );
+  }
+}*/
+
+void _processData(MainViewModel _mainModel, UserViewModel _userModel) async {
+  if (_headerController.text.isEmpty || _bodyController.text.isEmpty) {
+    _showAlertDialog('Uyarı', 'Header ve Body boş olamaz!');
+  } else {
+    List<String> imagePaths = [];
+    for (var image in _images) {
+      final appDir = await getApplicationDocumentsDirectory();
+      String fileName = image.path.split('/').last; // Dosya adını alalım
+      String newPath = '${appDir.path}/$fileName';
+
+      // Dosyayı uygulamanın özel klasörüne kopyalayalım
+      await image.copy(newPath);
+      
+      // Yeni yolunu listeye ekleyelim
+      imagePaths.add(newPath);
+    }
+    
+    _mainModel.sendPost(_headerController.text, _bodyController.text, imagePaths, _userModel.user.username);
+    
+    // Ana sayfaya yönlendirme
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/homepage',
+      (Route<dynamic> route) => false,
+    );
   }
 }
 

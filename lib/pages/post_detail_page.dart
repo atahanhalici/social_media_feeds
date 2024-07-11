@@ -1,6 +1,7 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -157,10 +158,11 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                             child: argument.imageUrl.length == 1
                                                 ? ClipRRect(
                                                     borderRadius: BorderRadius.circular(10),
-                                                    child: Image.memory(
-                                                      base64.decode(argument.imageUrl[0].split(',')[1]),
-                                                      fit: BoxFit.cover,
-                                                    ),
+                                                    child: Image.file(
+              File(argument.imageUrl[0]),
+          
+              fit: BoxFit.cover,
+            ),
                                                   )
                                                 :  argument.imageUrl.isEmpty
                                                     ? const SizedBox.shrink()
@@ -172,10 +174,11 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                     builder: (BuildContext context) {
                                       return ClipRRect(
                                         borderRadius: BorderRadius.circular(10),
-                                        child: Image.memory(
-                                          base64.decode(img.split(',')[1]),
-                                          fit: BoxFit.cover,
-                                        ),
+                                        child:  Image.file(
+              File(img),
+          
+              fit: BoxFit.cover,
+            ),
                                       );
                                     },
                                   );
@@ -314,7 +317,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
            onTap: () => _showBottomSheet(context,argument.likes),
           child: Row(
             children: [
-              Text("${argument.likes.contains(_userModel.user.username)?"Siz":{argument.likes[0]}}",style:const TextStyle(fontWeight: FontWeight.w700),),
+              Text(argument.likes.contains(_userModel.user.username)?"Siz":argument.likes[0],style:const TextStyle(fontWeight: FontWeight.w700),),
              const  Text(" ve "),
                 Text("${argument.likes.length - 1} kişi daha",style: const TextStyle(fontWeight: FontWeight.w700),),
              const    Text(" beğendi"),

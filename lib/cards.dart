@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -54,10 +55,16 @@ class _CardsState extends State<Cards> {
             child: widget.post.imageUrl.length == 1
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(10),
-                    child: Image.memory(
+                    child: 
+                    Image.file(
+              File(widget.post.imageUrl[0]),
+          
+              fit: BoxFit.contain,
+            ),
+                    /*Image.memory(
                       base64.decode(widget.post.imageUrl[0].split(',')[1]),
                       fit: BoxFit.contain,
-                    ),
+                    ),*/
                   )
                 : widget.post.imageUrl.isEmpty
                     ? const SizedBox.shrink()
@@ -67,12 +74,17 @@ class _CardsState extends State<Cards> {
                             items: widget.post.imageUrl.map((img) {
                               return Builder(
                                 builder: (BuildContext context) {
+                                
                                   return ClipRRect(
                                     borderRadius: BorderRadius.circular(10),
-                                    child: Image.memory(
+                                    child: Image.file(
+              File(img),
+            
+              fit: BoxFit.cover,
+            ),/*Image.memory(
                                       base64.decode(img.split(',')[1]),
                                       fit: BoxFit.cover,
-                                    ),
+                                    ),*/
                                   );
                                 },
                               );
