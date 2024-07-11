@@ -93,7 +93,7 @@ class _CardsState extends State<Cards> {
                             options: CarouselOptions(
                               padEnds: false,
                               viewportFraction: 1,
-                              height: 300,
+                              //height: 300,
                               autoPlay: true,
                               onPageChanged: (index, reason) {
                                 setState(() {
